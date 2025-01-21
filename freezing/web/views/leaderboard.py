@@ -50,14 +50,15 @@ def team_leaderboard_classic():
     team_members = {}
     # @UndefinedVariable
     for indiv_row in meta.scoped_session().execute(q).fetchall():
-        team_members.setdefault(indiv_row["team_id"], []).append(indiv_row)
+        team_members.setdefault(indiv_row._mapping["team_id"], []).append(indiv_row)
 
     my_team = next(
         (
             team_id
             for team_id in team_members
             if any(
-                member["athlete_id"] == athlete_id for member in team_members[team_id]
+                member._mapping["athlete_id"] == athlete_id
+                for member in team_members[team_id]
             )
         ),
         None,
@@ -65,7 +66,7 @@ def team_leaderboard_classic():
 
     for team_id in team_members:
         team_members[team_id] = reversed(
-            sorted(team_members[team_id], key=lambda m: m["total_score"])
+            sorted(team_members[team_id], key=lambda m: m._mapping["total_score"])
         )
 
     return render_template(
